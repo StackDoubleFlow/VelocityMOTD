@@ -1,6 +1,6 @@
 name: BungeeMOTD
 main: org.stonecipher.BungeeMOTD
-version: 1.0
+version: 1.1
 author: Nickster258
 commands:
   motd:
