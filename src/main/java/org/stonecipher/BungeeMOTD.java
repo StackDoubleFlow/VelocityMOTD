@@ -9,6 +9,6 @@ public class BungeeMOTD extends Plugin implements Listener {
     public void onEnable() {
         getProxy().getPluginManager().registerListener(this, new MotdListener(this));
         getProxy().getPluginManager().registerCommand(this, new MotdCommand(this));
-        getLogger().info("My MOTD just got loaded, kid");
+        getLogger().info("Loaded motd.txt");
     }
 }
