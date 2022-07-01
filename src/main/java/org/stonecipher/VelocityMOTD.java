@@ -10,23 +10,21 @@ import org.slf4j.Logger;
 
 import java.nio.file.Path;
 
-@Plugin(id = "bungeemotd", name = "BungeeMOTD", version = "1.2",
+@Plugin(id = "velocitymotd", name = "BungeeMOTD", version = "1.2",
         url = "https://github.com/StackDoubleFlow/VelocityMOTD",
         description = "This is a simple MOTD plugin written primarily for use by the Open Redstone Engineers.",
         authors = {"Nickster258", "StackDoubleFlow"})
-public class BungeeMOTD {
+public class VelocityMOTD {
 
     public final Logger logger;
     public final ProxyServer server;
     public final Path dataDirectory;
 
     @Inject
-    public BungeeMOTD(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+    public VelocityMOTD(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         this.server = server;
         this.logger = logger;
         this.dataDirectory = dataDirectory;
-
-        logger.info("Hello there! I made my first plugin with Velocity.");
     }
 
     @Subscribe

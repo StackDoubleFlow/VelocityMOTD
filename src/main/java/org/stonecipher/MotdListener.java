@@ -5,9 +5,9 @@ import com.velocitypowered.api.event.player.ServerConnectedEvent;
 
 public class MotdListener {
 
-    private BungeeMOTD plugin;
+    private VelocityMOTD plugin;
 
-    public MotdListener(BungeeMOTD plugin) {
+    public MotdListener(VelocityMOTD plugin) {
         this.plugin = plugin;
     }
 

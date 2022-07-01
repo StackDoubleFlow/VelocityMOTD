@@ -5,7 +5,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.io.*;
@@ -16,7 +15,7 @@ public class Motd {
     public static String defaultMotd = "&7hey, &4&l%PLAYERNAME%&7, you nerd.";
     private static final Pattern URL_REGEX = Pattern.compile("https://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 
-    public static String motdReplacements(BungeeMOTD plugin, String motd, Player p) {
+    public static String motdReplacements(VelocityMOTD plugin, String motd, Player p) {
         String tmpMotd = motd;
 
         tmpMotd = tmpMotd.replaceAll("%PLAYERNAME%", p.getUsername());
@@ -32,7 +31,7 @@ public class Motd {
         return LegacyComponentSerializer.builder().character('&').build().deserialize(raw).replaceText(replacementConfig);
     }
 
-    public static Component loadMotd(BungeeMOTD plugin, Player player) {
+    public static Component loadMotd(VelocityMOTD plugin, Player player) {
         File dataDir = plugin.dataDirectory.toFile();
         if (!dataDir.exists()) {
             dataDir.mkdir();

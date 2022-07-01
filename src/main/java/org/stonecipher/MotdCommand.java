@@ -6,9 +6,9 @@ import com.velocitypowered.api.proxy.Player;
 
 public class MotdCommand implements SimpleCommand {
 
-    private BungeeMOTD plugin;
+    private VelocityMOTD plugin;
 
-    public MotdCommand(BungeeMOTD plugin) {
+    public MotdCommand(VelocityMOTD plugin) {
         this.plugin = plugin;
     }
 
