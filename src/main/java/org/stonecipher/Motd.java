@@ -1,93 +1,77 @@
 package org.stonecipher;
 
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Plugin;
+import com.velocitypowered.api.proxy.Player;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.event.HoverEventSource;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.io.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Motd {
 
     public static String defaultMotd = "&7hey, &4&l%PLAYERNAME%&7, you nerd.";
+    private static final Pattern URL_REGEX = Pattern.compile("https://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 
-    public static String motdReplacements(String motd, ProxiedPlayer p) {
+    public static String motdReplacements(BungeeMOTD plugin, String motd, Player p) {
         String tmpMotd = motd;
-        tmpMotd = tmpMotd.replaceAll("%PLAYERNAME%", p.getDisplayName());
-        tmpMotd = tmpMotd.replaceAll("%ONLINE_COUNT%", "" + ProxyServer.getInstance().getOnlineCount());
-        tmpMotd = tmpMotd.replaceAll("&", "§");
+
+        tmpMotd = tmpMotd.replaceAll("%PLAYERNAME%", p.getUsername());
+        tmpMotd = tmpMotd.replaceAll("%ONLINE_COUNT%", "" + plugin.server.getAllPlayers().size());
         return tmpMotd;
     }
 
-    public static TextComponent renderTextComponent(String raw) {
-        String urlRegex = "https://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
-        Pattern pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
-        Matcher urlMatcher = pattern.matcher(raw);
-
-        TextComponent textBuilder = new TextComponent();
-        int lastIndex = 0;
-
-        while (urlMatcher.find()) {
-            int startingIndex = urlMatcher.start();
-            int endingIndex = urlMatcher.end();
-            TextComponent prefix = new TextComponent(raw.substring(lastIndex, startingIndex));
-            textBuilder.addExtra(prefix);
-            TextComponent url = new TextComponent(raw.substring(startingIndex, endingIndex));
-            url.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Visit " + raw.substring(startingIndex, endingIndex)).create()));
-            url.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, raw.substring(startingIndex, endingIndex)));
-            textBuilder.addExtra(url);
-            lastIndex = endingIndex;
-        }
-        textBuilder.addExtra(new TextComponent(raw.substring(lastIndex)));
-        return textBuilder;
+    public static Component renderTextComponent(String raw) {
+        TextReplacementConfig replacementConfig = TextReplacementConfig.builder().match(URL_REGEX).replacement(url -> {
+            String clickUrl = url.content();
+            return url.clickEvent(ClickEvent.openUrl(clickUrl)).hoverEvent(HoverEvent.showText(Component.text("Visit " + clickUrl)));
+        }).build();
+        return LegacyComponentSerializer.builder().character('&').build().deserialize(raw).replaceText(replacementConfig);
     }
 
-    public static TextComponent loadMotd(Plugin plugin, ProxiedPlayer player) {
-        if (!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdir();
+    public static Component loadMotd(BungeeMOTD plugin, Player player) {
+        File dataDir = plugin.dataDirectory.toFile();
+        if (!dataDir.exists()) {
+            dataDir.mkdir();
         }
-        File motdFile = new File(plugin.getDataFolder(), "motd.txt");
+
+        String filename = plugin.dataDirectory + "/motd.txt";
+        File motdFile = new File(filename);
         if (!motdFile.exists()) {
             try {
                 motdFile.createNewFile();
-                PrintStream out = new PrintStream(new FileOutputStream(plugin.getDataFolder().toString() + "/motd.txt"));
+                PrintStream out = new PrintStream(new FileOutputStream(filename));
                 out.print(defaultMotd);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         } else {
             try {
-                BufferedReader motd = new BufferedReader(new InputStreamReader(new FileInputStream(plugin.getDataFolder().toString() + "/motd.txt")));
+                BufferedReader motd = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
                 String line = motd.readLine();
 
                 StringBuilder sb = new StringBuilder();
 
-                while(line != null){
+                while (line != null) {
                     sb.append(line).append("\n");
                     line = motd.readLine();
                 }
 
                 String resultTemplate = sb.toString().trim();
-                String resultReplaced = motdReplacements(resultTemplate, player);
+                String resultReplaced = motdReplacements(plugin, resultTemplate, player);
 
-                TextComponent rendered = renderTextComponent(resultReplaced);
+                Component rendered = renderTextComponent(resultReplaced);
 
                 return rendered;
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return new TextComponent(defaultMotd);
+        return Component.text(defaultMotd);
     }
 }

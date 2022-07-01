@@ -1,24 +1,24 @@
 package org.stonecipher;
 
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
-import net.md_5.bungee.api.plugin.Plugin;
+import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.command.SimpleCommand;
+import com.velocitypowered.api.proxy.Player;
 
-public class MotdCommand extends Command {
+public class MotdCommand implements SimpleCommand {
 
-    private Plugin plugin;
+    private BungeeMOTD plugin;
 
-    public MotdCommand(Plugin plugin) {
-        super("motd");
+    public MotdCommand(BungeeMOTD plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public void execute(CommandSender sender, String[] args) {
-        if(sender instanceof ProxiedPlayer) {
-            ProxiedPlayer pp = (ProxiedPlayer) sender;
-            sender.sendMessage(Motd.loadMotd(this.plugin, pp));
+    public void execute(final Invocation invocation) {
+        CommandSource source = invocation.source();
+
+        if (source instanceof Player) {
+            Player pp = (Player) source;
+            source.sendMessage(Motd.loadMotd(this.plugin, pp));
         }
     }
 }
