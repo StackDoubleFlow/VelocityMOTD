@@ -1,8 +1,0 @@
-name: BungeeMOTD
-main: org.stonecipher.BungeeMOTD
-version: 1.1
-author: Nickster258
-commands:
-  motd:
-    description: Displays the current motd
-    usage: /motd
